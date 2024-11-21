@@ -1,49 +1,108 @@
-# History files
-.Rhistory
-.Rapp.history
+---
+title: "Fitness Supplements and Sport/Exercise Types"
+author: "Bradley Lanfair"
+Date: 11/21/2024
+output: html_document
+---
 
-# Session Data files
-.RData
-.RDataTmp
 
-# User-specific files
-.Ruserdata
+Introduction
 
-# Example code in package build process
-*-Ex.R
+This report analyzes the performance supplements data and explores the sport/exercise types that have been tested with the supplements. We will count the frequency of each sport/exercise type and visualize the results using bar plots and pie charts. The data set I used was called "Sports Supplements" on Kaggle. 
 
-# Output files from R CMD build
-/*.tar.gz
+## Load Required Libraries
 
-# Output files from R CMD check
-/*.Rcheck/
+```{r setup, include=TRUE}
+# Load necessary libraries
+install.packages(c("ggplot2", "dplyr", "tidyverse", "rmarkdown"))
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
 
-# RStudio files
-.Rproj.user/
 
-# produced vignettes
-vignettes/*.html
-vignettes/*.pdf
+knitr::opts_chunk$set(echo = TRUE)
+```
 
-# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
+##Introduction
 
-# knitr and R markdown default cache directories
-*_cache/
-/cache/
+This report analyzes the performance supplements data and explores the sport/exercise types that have been tested with the supplements. We will count the frequency of each sport/exercise type and visualize the results using bar plots and pie charts.
 
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
 
-# R Environment Variables
-.Renviron
+Question 1:
 
-# pkgdown site
-docs/
+A new fitness comapny wants to advertise a new line of the best perforamnce supplements,so they want to know what people can take to actually improve performance, according to science.
 
-# translation temp files
-po/*~
 
-# RStudio Connect folder
-rsconnect/
+Question 2:
+
+ What sport/ exercise was tested and what was the most frequent?
+
+```{r}
+# Create the data frame for supplements
+supplements_data <- data.frame(
+  Supplement = c("Caffeine", "BCAAs", "Beetroot Juice", "Beta Alanine", "Bovine Colostrum", "Creatine", "HMB", "Whey Protein", "HCA", "CLA"),
+  Evidence_Level = c(6, 5, 4, 4, 2, 5, 4, 6, 3, 4),
+  Claimed_Improvement = c("Intense aerobic performance, endurance performance, mood during exercise, performance when sleep-deprived, skill/agility/speed",
+                          "Fatigue resistance, muscle damage + soreness, aerobic performance, endurance, power",
+                          "Aerobic efficiency",
+                          "High-intensity performance, training tolerance, fatigue, muscular endurance, power",
+                          "High-intensity performance, endurance, muscle gain, strength, power, immune defences in athletes",
+                          "Strength, power, muscle mass, neuromuscular function, high-intensity performance, muscle damage, recovery",
+                          "Strength, muscle building, fat loss, muscle damage, recovery",
+                          "Strength, muscle building + recovery, weight + fat loss",
+                          "Fat burning, weight loss, endurance",
+                          "Body composition, fat burning"),
+  Fitness_Category = c("Aerobic-endurance, sports psychology, anaerobic-high-intensity",
+                       "Aerobic-endurance, anaerobic-high-intensity, strength–power, recovery–injury prevention",
+                       "Aerobic-endurance",
+                       "Aerobic-endurance, anaerobic-high-intensity, strength–power, recovery–injury prevention",
+                       "Aerobic-endurance, strength–power, fat burning–muscle building",
+                       "Strength–power, anaerobic-high-intensity, fat burning–muscle building",
+                       "Strength–power, fat burning–muscle building, recovery–injury prevention",
+                       "Strength–power, recovery–injury prevention, fat burning–muscle building",
+                       "Fat burning–muscle building, aerobic–endurance",
+                       "Fat burning–muscle building"),
+  Sport_Testing = c("Cycling, rowing, weight training, running, football",
+                    "Cycling, circuit training, swimming, weight training, running",
+                    "Running, cycling",
+                    "Rowing, cycling, running, weight training",
+                    "Cycling, running, weight training, swimming, rowing",
+                    "Weight training, cycling, rowing, running, circuit training",
+                    "Weight training, cycling, running",
+                    "Weight training, running",
+                    "Cycling, other",
+                    "Other"),
+  Number_Studies = c(7, 4, 4, 3, 5, 19, 4, 11, 4, 11),
+  Citations = c(409, 660, 5, 284, 194, 5090, 327, 320, 54, 374)
+)
+
+```
+```{r}
+# Bar plot for the sport/exercise type counts
+ggplot(supplements_data, aes(x = Supplement, y = Evidence_Level, fill = Evidence_Level)) +
+  geom_bar(stat = "identity") +
+  scale_fill_gradient(low = "green", high = "darkgreen") + # Optional: adjust the color range
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+# Split the Sport_Testing column to handle multiple sports/exercises per entry
+# This assumes the sport types are separated by commas
+sport_exercise_split <- strsplit(supplements_data$Sport_Testing, ",\\s*")
+
+# Unlist the split data to create a vector of individual sport types
+sport_exercise_list <- unlist(sport_exercise_split)
+
+# Count the frequency of each sport/exercise type
+sport_exercise_counts <- table(sport_exercise_list)
+
+# Convert to a data frame for easier manipulation and visualization
+sport_exercise_df <- as.data.frame(sport_exercise_counts)
+
+# Rename columns for clarity
+colnames(sport_exercise_df) <- c("Sport_Exercise_Type", "Count")
+
+# Print the counts for each sport/exercise type
+sport_exercise_df
+
+```
